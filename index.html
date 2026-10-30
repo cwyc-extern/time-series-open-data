@@ -11,11 +11,11 @@
 /* Layout: one quiet figure, map on the left, the selected point and the spread of rates on the right, caption underneath. */
 :root{
   --bg:#F3F1EB; --ink:#16161A; --muted:#55555C; --line:#CFCBC1; --band:#E2E3DC; --accent:#2340C8;
-  --early:#3F7A86; --late:#D0704A; --pick:#1F2A28; --pick-fill:#FFFFFF; --water:#3F7A86; --bare:#D2AE6D; --veg:#6E9A55; --image-opacity:0.38;
+  --early:#3F7A86; --late:#D0704A; --pick:#1F2A28; --pick-fill:#FFFFFF; --water:#3F7A86; --bare:#D2AE6D; --veg:#6E9A55; --image-opacity:0.38; --btn:#E1DED5; --btn-line:#C2BEB3;
   --display:'Instrument Sans', system-ui, sans-serif; --body:'Instrument Sans', system-ui, sans-serif; --mono:'Familjen Grotesk', system-ui, sans-serif;
 }
-@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --bg:#17171A; --ink:#EDEBE5; --muted:#A3A3A9; --line:#3A3A40; --band:#26282A; --accent:#8C9DF0; --early:#6FB0BB; --late:#EE8E66; --pick:#E8E6DF; --pick-fill:#F6F4EE; --water:#6FB0BB; --bare:#C9A565; --veg:#86B26B; --image-opacity:0.45; color-scheme:dark } }
-:root[data-theme="dark"]{ --bg:#17171A; --ink:#EDEBE5; --muted:#A3A3A9; --line:#3A3A40; --band:#26282A; --accent:#8C9DF0; --early:#6FB0BB; --late:#EE8E66; --pick:#E8E6DF; --pick-fill:#F6F4EE; --water:#6FB0BB; --bare:#C9A565; --veg:#86B26B; --image-opacity:0.45; color-scheme:dark }
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --bg:#17171A; --ink:#EDEBE5; --muted:#A3A3A9; --line:#3A3A40; --band:#26282A; --accent:#8C9DF0; --early:#6FB0BB; --late:#EE8E66; --pick:#E8E6DF; --pick-fill:#F6F4EE; --water:#6FB0BB; --bare:#C9A565; --veg:#86B26B; --image-opacity:0.45; --btn:#303035; --btn-line:#4A4A51; color-scheme:dark } }
+:root[data-theme="dark"]{ --bg:#17171A; --ink:#EDEBE5; --muted:#A3A3A9; --line:#3A3A40; --band:#26282A; --accent:#8C9DF0; --early:#6FB0BB; --late:#EE8E66; --pick:#E8E6DF; --pick-fill:#F6F4EE; --water:#6FB0BB; --bare:#C9A565; --veg:#86B26B; --image-opacity:0.45; --btn:#303035; --btn-line:#4A4A51; color-scheme:dark }
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 var(--body)}
 .wrap{position:relative;max-width:1180px;margin:0 auto;padding-block:40px 56px;padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));display:flex;flex-direction:column;gap:20px}
@@ -37,7 +37,7 @@ h1{font:700 30px/1.1 var(--display);letter-spacing:-0.02em;margin:0;text-wrap:ba
 .controls{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;font-size:0.85rem}
 button{font:400 13px var(--mono);letter-spacing:0.02em;color:var(--ink);background:transparent;border:1px solid var(--line);border-radius:999px;padding:6px 14px;cursor:pointer}
 button:hover{border-color:var(--ink)}
-button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+button[aria-pressed="true"]{background:var(--btn);color:var(--ink);border-color:var(--btn-line)}
 button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .caption{font:400 13px/1.5 var(--mono);letter-spacing:0.02em;color:var(--muted);max-width:86ch;margin:8px 0 0;text-align:left}
 .flow{border-top:1px solid var(--ink);padding-top:28px;margin-top:12px;display:flex;flex-direction:column;gap:18px}
@@ -107,15 +107,15 @@ svg text{font-family:var(--body);fill:var(--ink)}
 .timeline{display:flex;flex-direction:column;gap:10px;margin-top:8px}
 .chips{display:flex;flex-wrap:wrap;gap:6px}
 .chips button{font:400 12.5px var(--mono);padding:4px 10px;font-variant-numeric:tabular-nums}
-.chips button[data-current="true"]{box-shadow:0 0 0 2px var(--late)}
-.key{display:flex;flex-wrap:wrap;gap:6px 16px;font:400 12.5px var(--mono);letter-spacing:0.02em;color:var(--muted)}
+.chips button[data-current="true"]{box-shadow:inset 0 0 0 1.5px var(--ink)}
+.key{display:grid;grid-template-rows:repeat(3,auto);grid-auto-flow:column;justify-content:start;gap:6px 32px;font:400 12.5px var(--mono);letter-spacing:0.02em;color:var(--muted)}
 .key span{display:inline-flex;align-items:center;gap:6px}
 .sw{display:inline-block;width:22px;height:0;border-top:1.5px solid}
 @media (prefers-reduced-motion: reduce){ .anim-note{display:block} }
 .still .hit, .still .ring, .still .pop, .still .chips{display:none!important}
 #map{cursor:pointer}
 .embed .wrap{max-width:980px;padding-block:20px 20px;gap:10px}
-.embed .credit{font:400 11.5px/1.45 var(--mono);letter-spacing:0.02em;color:var(--muted);margin:0}
+.embed .credit{font:400 11.5px/1.45 var(--mono);letter-spacing:0.02em;color:var(--muted);margin:18px 0 0}
 /* still frames for video or print: map, year and key only; title and credit live on the PDF page */
 .still .controls, .still .credit, .still .wrap > div:first-child{display:none}
 .still .wrap{padding-block:8px 8px;gap:4px}
@@ -143,7 +143,7 @@ svg text{font-family:var(--body);fill:var(--ink)}
         </div>
       </div>
       <div class="pop-hist">
-        <div class="k">Banks moved both ways</div>
+        <div class="k">Bank morphology</div>
         <div class="sub2" id="median" style="margin-bottom:8px"></div>
         <svg id="hist" viewBox="-18 -2 278 142" role="img" aria-label="Spread of bank movement rates with the selected point marked for both sources" style="margin-top:6px"></svg>
         <div class="sub2" id="count" style="margin-top:12px"></div>
@@ -175,13 +175,12 @@ svg text{font-family:var(--body);fill:var(--ink)}
           <span><i class="sw" style="border-color:var(--muted);opacity:.5"></i>earlier years</span>
           <span><i class="sw" style="border-color:var(--early);border-top-width:2.4px"></i>narrower: moved towards the river</span>
           <span><i class="sw" style="border-color:var(--late);border-top-width:2.4px"></i>wider: moved into the land</span>
-          <span><i class="sw" style="border-color:var(--muted);border-top-width:2.4px;opacity:.6"></i>within measurement noise</span>
         </div>
       </div>
     </div>
   </div>
 
-  <p class="credit">Each outline is one observation of the banks: the reference (earliest) outline and the current year. High-resolution banks traced on Esri World Imagery Wayback captures (Ikonos, GeoEye-1, WorldView-2/-3, Legion-2; 0.3–1 m), non-commercial use. Open data: Landsat and Copernicus Sentinel-2 via Digital Earth Africa. Rivers © OpenStreetMap contributors. Confluence Risk Mitigation.</p>
+  <p class="credit">(Prototype) Each outline is one observation of the banks: the reference (earliest) outline and the current year. High-resolution banks traced on Esri World Imagery Wayback captures (Ikonos, GeoEye-1, WorldView-2/-3, Legion-2; 0.3–1 m), non-commercial use. Open data: Landsat and Copernicus Sentinel-2 via Digital Earth Africa. Rivers © OpenStreetMap contributors. Confluence Risk Mitigation.</p>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
@@ -614,7 +613,7 @@ function hist(){
   const nm = S.kind === "vhr" ? "high res" : "open";
   document.getElementById("median").textContent = `bars: every ${nm} bank point; median ${fmt(d3.median(rates))} m/yr`;
   const out = rates.filter(r => r < lo || r > hi).length;
-  document.getElementById("count").textContent = `A rate is calculated for each of the ${rates.length} points along the banks, fitted to all its outlines. Bars left of 0 are stretches where the channel narrowed, bars right of 0 where it widened, so the balance shows whether the river has gained or lost room for water. The axis runs from ${fmt(lo)} to ${fmt(hi)} m/yr, which covers all but the ${out} most extreme points; those are left off so that a few outliers, often tracing errors, do not squeeze the other bars together.`;
+  document.getElementById("count").textContent = `One rate per bank point (${rates.length}), fitted to all its outlines. Left of 0 the channel narrowed, right of 0 it widened; the balance shows whether the river gained or lost room for water. Axis ${fmt(lo)} to ${fmt(hi)} m/yr; the ${out} most extreme points are left off.`;
 }
 
 // ---- animation: one observation at a time, pausing on the last with reference and latest overlaid
@@ -667,7 +666,7 @@ if (STILL != null) {                                  // one still frame: refere
 
 const firstS2 = years[D.sensors.indexOf("Sentinel-2")];
 document.getElementById("subtitle").textContent = "Pilot site in Angwan Dodo, Gwagwalada, Nigeria";
-if (!EMBED) document.getElementById("caption").textContent = `Each outline is one observation of the banks. The current year is bold; the reference, the earliest outline, is bold at half strength; earlier years are faint. Colour shows how far each stretch has moved since the reference: blue where the bank has moved towards the river (narrower), orange where it has moved into the land (wider), grey where the change is within the measurement noise (±2 m for high-resolution traces, ±5 m for open data). After one pass only the reference stays on; use the year buttons to bring back any outline. High-resolution traces: banks traced automatically on ${V.labels.length} Esri World Imagery Wayback captures from ${V.labels[0].slice(0, 4)} to ${V.labels.at(-1).slice(0, 4)} (Ikonos, GeoEye-1, WorldView-2 and -3, Legion-2; 0.3–1 m), used for non-commercial purposes; at the confluence the 2013 layer shows a 2009 capture, and rates use each point's own capture date. This is a first pass not yet checked by eye: about ${Math.round(V.review_share * 100)}% of traced points are marked for review. Median rate: ${fmt(V.channels.main.median_rate)} m/yr on the Lower Usuma, ${fmt(V.channels.tributary.median_rate)} m/yr on the River Wuye${V.channels.small ? `, ${fmt(V.channels.small.median_rate)} m/yr on the small tributary beside the homes` : ""}. The small tributary is not on OpenStreetMap: its centre line was mapped from the 2024 image, and at about 10–20 m wide it appears only in the high-resolution traces. Open data: Landsat (30 m) up to ${firstS2 - 1} and Sentinel-2 (10 m) from ${firstS2}, banks found every ${D.step} m where the water signal fades${D.skipped.length ? `; the ${D.skipped.join(" and ")} images are left out` : ""}; rates allow for a constant difference between the two satellites. Sources: Landsat and Copernicus Sentinel-2 via Digital Earth Africa; river lines © OpenStreetMap contributors; Esri World Imagery Wayback.`;
+if (!EMBED) document.getElementById("caption").textContent = `(Prototype) Each outline is one observation of the banks. The current year is bold; the reference, the earliest outline, is bold at half strength; earlier years are faint. Colour shows how far each stretch has moved since the reference: blue where the bank has moved towards the river (narrower), orange where it has moved into the land (wider), grey where the change is within the measurement noise (±2 m for high-resolution traces, ±5 m for open data). After one pass only the reference stays on; use the year buttons to bring back any outline. High-resolution traces: banks traced automatically on ${V.labels.length} Esri World Imagery Wayback captures from ${V.labels[0].slice(0, 4)} to ${V.labels.at(-1).slice(0, 4)} (Ikonos, GeoEye-1, WorldView-2 and -3, Legion-2; 0.3–1 m), used for non-commercial purposes; at the confluence the 2013 layer shows a 2009 capture, and rates use each point's own capture date. This is a first pass not yet checked by eye: about ${Math.round(V.review_share * 100)}% of traced points are marked for review. Median rate: ${fmt(V.channels.main.median_rate)} m/yr on the Lower Usuma, ${fmt(V.channels.tributary.median_rate)} m/yr on the River Wuye${V.channels.small ? `, ${fmt(V.channels.small.median_rate)} m/yr on the small tributary beside the homes` : ""}. The small tributary is not on OpenStreetMap: its centre line was mapped from the 2024 image, and at about 10–20 m wide it appears only in the high-resolution traces. Open data: Landsat (30 m) up to ${firstS2 - 1} and Sentinel-2 (10 m) from ${firstS2}, banks found every ${D.step} m where the water signal fades${D.skipped.length ? `; the ${D.skipped.join(" and ")} images are left out` : ""}; rates allow for a constant difference between the two satellites. Sources: Landsat and Copernicus Sentinel-2 via Digital Earth Africa; river lines © OpenStreetMap contributors; Esri World Imagery Wayback.`;
 
 // channel width per year
 if (!EMBED) (function(){
