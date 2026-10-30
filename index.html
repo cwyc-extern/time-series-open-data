@@ -112,7 +112,8 @@ svg text{font-family:var(--body);fill:var(--ink)}
 .key span{display:inline-flex;align-items:center;gap:6px}
 .sw{display:inline-block;width:22px;height:0;border-top:1.5px solid}
 @media (prefers-reduced-motion: reduce){ .anim-note{display:block} }
-.embed .hit, .embed .ring{display:none}
+.still .hit, .still .ring, .still .pop, .still .chips{display:none!important}
+#map{cursor:pointer}
 .embed .wrap{max-width:980px;padding-block:20px 20px;gap:10px}
 .embed .credit{font:400 11.5px/1.45 var(--mono);letter-spacing:0.02em;color:var(--muted);margin:0}
 /* still frames for video or print: map, year and key only; title and credit live on the PDF page */
@@ -123,6 +124,32 @@ svg text{font-family:var(--body);fill:var(--ink)}
 <body>
 
 <div class="wrap">
+  <div class="pop" id="pop" data-open="false" hidden role="dialog" aria-label="Selected point">
+    <div class="pop-head">
+      <span class="pop-grip" aria-hidden="true">⠿</span><span class="pop-ll" id="pop-ll"></span>
+      <button id="pop-toggle" type="button" aria-expanded="false" aria-label="Expand details">+</button>
+    </div>
+    <div class="pop-body">
+      <div class="small" id="pop-where" style="color:var(--ink)"></div>
+      <div class="pop-sec">
+        <div class="k">Impact on the water channel</div>
+        <div class="sub2">estimated from bank morphology changes</div>
+        <div class="cmp">
+          <span></span><span class="src" id="h-vhr"><i class="sym vhr"></i>high res</span><span class="src" id="h-open"><i class="sym open"></i>open</span>
+          <span class="rl">period</span><span class="num" id="cmp-vhr-name"></span><span class="num" id="cmp-open-name"></span>
+          <span class="rl">rate [m/yr]</span><span class="val num" id="cmp-vhr-rate"></span><span class="val num" id="cmp-open-rate"></span>
+          <span class="rl" id="cmp-se-label">± [m/yr]</span><span class="mono num" id="cmp-vhr-se"></span><span class="mono num" id="cmp-open-se"></span>
+          <span class="rl" id="cmp-since-label">overall change [m]</span><span class="num" id="cmp-vhr-since"></span><span class="num" id="cmp-open-since"></span>
+        </div>
+      </div>
+      <div class="pop-hist">
+        <div class="k">Banks moved both ways</div>
+        <div class="sub2" id="median" style="margin-bottom:8px"></div>
+        <svg id="hist" viewBox="-18 -2 278 142" role="img" aria-label="Spread of bank movement rates with the selected point marked for both sources" style="margin-top:6px"></svg>
+        <div class="sub2" id="count" style="margin-top:12px"></div>
+      </div>
+    </div>
+  </div>
   <div>
     <h1>Channel morphology of the Lower Usuma</h1>
     <div class="sub" id="subtitle">Yearly satellite observations · Angwan Dodo, Gwagwalada</div>
@@ -139,10 +166,13 @@ svg text{font-family:var(--body);fill:var(--ink)}
       <div class="timeline">
         <div class="controls">
           <button id="play" type="button" aria-pressed="true">Pause</button>
+          <span class="small" id="tl-hint">Pick years to compare; click anywhere along a bank to see how it moved there.</span>
         </div>
+        <div class="chips" id="chips" role="group" aria-label="Outlines shown"></div>
         <div class="key">
           <span><i class="sw" style="border-color:var(--ink);opacity:.5;border-top-width:1.2px"></i>reference (earliest)</span>
           <span><i class="sw" style="border-color:var(--muted);border-top-width:2.4px"></i>current year</span>
+          <span><i class="sw" style="border-color:var(--muted);opacity:.5"></i>earlier years</span>
           <span><i class="sw" style="border-color:var(--early);border-top-width:2.4px"></i>narrower: moved towards the river</span>
           <span><i class="sw" style="border-color:var(--late);border-top-width:2.4px"></i>wider: moved into the land</span>
           <span><i class="sw" style="border-color:var(--muted);border-top-width:2.4px;opacity:.6"></i>within measurement noise</span>
@@ -400,7 +430,13 @@ function build(){
     .attr("cx", st => pos(st, d3.median(st.off.filter(v => v != null)))[0]).attr("cy", st => pos(st, d3.median(st.off.filter(v => v != null)))[1])
     .on("click", (e, st) => select(st)).append("title").text(st => `${st.label}, ${st.compass} bank${st.mouth ? " (confluence mouth)" : ""}: ${fmt(st.rate)} m/yr`);
   visible = new Set(S.obs.map(o => o.i));
-  chips(); if (!EMBED) hist();
+  svg.on("click", e => {
+    if (e.target.classList.contains("hit")) return;
+    const [mx, my] = d3.pointer(e, svg.node());
+    const near = d3.least(all, st => { const [x, y] = pos(st, st.off[cur] ?? d3.median(st.off.filter(v => v != null))); return (x - mx) ** 2 + (y - my) ** 2; });
+    if (near) select(near);
+  });
+  chips(); hist();
 }
 function render(fade = false){
   // manual mode (after a chip click): show exactly the chosen outlines, the most recent of them bold
@@ -470,8 +506,10 @@ function placePop(){
   let left, top;
   if (popAt) [left, top] = popAt;
   else {
-    const sub = document.getElementById("subtitle").getBoundingClientRect(), yr = yearText.node().getBoundingClientRect();
-    left = yr.right - box.left - w; top = (sub.bottom + yr.top) / 2 - box.top;
+    const yr = yearText.node().getBoundingClientRect();
+    left = yr.right - box.left - w;
+    if (EMBED) top = document.getElementById("src-vhr").getBoundingClientRect().top - box.top;
+    else { const sub = document.getElementById("subtitle").getBoundingClientRect(); top = (sub.bottom + yr.top) / 2 - box.top; }
   }
   left = Math.max(0, Math.min(box.width - w, left)); top = Math.max(0, Math.min(box.height - h, top));
   pop.style.left = left + "px"; pop.style.top = top + "px";
@@ -593,7 +631,7 @@ function play(){
       // hold the last year for one step, then leave only the baseline on; the chips add years back
       // (the animation-only build loops instead, after a longer hold)
       setTimeout(() => {
-        if (EMBED) { if (!timer && STILL == null) play(); return; }
+        if (EMBED) { if (!timer && !manual && STILL == null) play(); return; }
         if (!timer && !manual) { manual = true; visible = new Set([S.ref]); syncChips(); render(true); place(); }
       }, EMBED ? STEP_MS * 1.6 : STEP_MS);
     }
@@ -615,7 +653,7 @@ function useSource(kind){
   const start = keep && keep.d < 40 ? keep.v : S.banks.flatMap(b => b.sts).filter(v => v.key === "main" && v.compass === "north" && v.rate != null)
     .sort((a, b) => Math.abs(a.x - homeX) - Math.abs(b.x - homeX))[0];
   cur = reduce ? S.obs.length - 1 : S.ref;
-  if (!EMBED) select(start);
+  if (STILL == null) select(start);
   render();
   if (!reduce) play(); else stop("Replay");
 }
